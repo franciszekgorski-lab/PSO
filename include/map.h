@@ -10,7 +10,7 @@ typedef struct _map{
         int size;
 } Map;
 
-Map* Map_Construct(int w, int h, int max_depth, int max_peak);
+Map* Map_Construct(int w, int h, int max_d, int max_p);
 void Map_Generate(Map* map);
 
 #endif
