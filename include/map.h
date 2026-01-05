@@ -14,5 +14,6 @@ typedef struct _map{
 Map* Map_Construct(int w, int h, int max_d, int max_p);
 void Map_Generate(Map* map);
 double Map_GetDist(Map* map, int index0, int index1);
+void Map_Print(Map* map);
 
 #endif

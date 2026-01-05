@@ -1,6 +1,7 @@
 #include "map.h"
 #include "utils.h"
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include <time.h>
@@ -61,4 +62,11 @@ double Map_GetDist(Map* map, int index0, int index1) {
         double y = fabs(y0) + fabs(y1);
 
         return sqrt(x*x + y*y);
+}
+
+void Map_Print(Map* map) {
+        for (int i = 0; i < map->depth->size; i++) {
+                printf("%3.1f ", map->depth->value[i]);
+                if ( i % map->width == 0 ) printf("\n");
+        }
 }

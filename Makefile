@@ -1,6 +1,6 @@
 COMP = gcc
 COMP_FLAGS = -Wall -Wextra -Iinclude $(shell pkg-config --cflags sdl2)
-LD_FLAGS = $(shell pkg-config --libs sdl2)
+LD_FLAGS = -lm $(shell pkg-config --libs sdl2)
 
 TARGET = PSO
 SRC = $(wildcard src/*.c)
