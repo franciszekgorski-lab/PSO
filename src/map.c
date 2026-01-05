@@ -20,6 +20,14 @@ void Map_Generate(Map* map) {
         
         srand(time(NULL));
 
-        int peak_count = (rand() % 5) + 2;
+        int peak_count = 5 + (rand() % 10);
+
+        for (int i = 0; i < peak_count; i++) {
+                int index = rand() % map->depth->size;
+                int radius = 30 + (rand() % 100);
+                double depth = (rand() % ( (map->max_depth * -1) + map->max_peak )) + (map->max_depth);
+
+                
+        }
 
 }
