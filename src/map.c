@@ -2,6 +2,7 @@
 #include "utils.h"
 
 #include <stdlib.h>
+#include <math.h>
 #include <time.h>
 
 Map* Map_Construct(int w, int h, int max_d, int max_p) {
@@ -23,11 +24,41 @@ void Map_Generate(Map* map) {
         int peak_count = 5 + (rand() % 10);
 
         for (int i = 0; i < peak_count; i++) {
+                Vector* dists = Vector_Construct(0);
+                Vector* indexs = Vector_Construct(0);
+
                 int index = rand() % map->depth->size;
                 int radius = 30 + (rand() % 100);
-                double depth = (rand() % ( (map->max_depth * -1) + map->max_peak )) + (map->max_depth);
+                double max = (rand() % ( (map->max_depth * -1) + map->max_peak )) + (map->max_depth);
 
-                
+                for (int j = 0; j < map->depth->size; j++) {
+                        if ( Map_GetDist(map, index, j) <= (double)radius) {
+                                Vector_Append(indexs, j);
+                                Vector_Append(dists, Map_GetDist(map, index, j));
+                        }
+                }
+
+                for (int j = 0; j < indexs->size; j++) {
+                        int depth = max / radius;
+
+                        if (max > 0) {
+                                map->depth->value[(int)indexs->value[j]] += max - depth * dists->value[j];
+                        } else {
+                                map->depth->value[(int)indexs->value[j]] -= max - depth * dists->value[j];
+                        }
+                }
         }
 
+}
+
+double Map_GetDist(Map* map, int index0, int index1) {
+        int x0 = index0 % map->width;
+        int x1 = index1 % map->width;        
+        int y0 = (index0 - x0)/ map->width;
+        int y1 = (index1 - x1) / map->width;
+
+        double x = fabs(x0) + fabs(x1);
+        double y = fabs(y0) + fabs(y1);
+
+        return sqrt(x*x + y*y);
 }
