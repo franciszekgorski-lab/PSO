@@ -32,6 +32,11 @@ void Map_Generate(Map* map) {
                 int radius = 30 + (rand() % 100);
                 double max = (rand() % ( (map->max_depth * -1) + map->max_peak )) + (map->max_depth);
 
+                if (max == 0) {
+                        i--;
+                        continue;
+                }
+
                 for (int j = 0; j < map->depth->size; j++) {
                         if ( Map_GetDist(map, index, j) <= (double)radius) {
                                 Vector_Append(indexs, j);
@@ -40,7 +45,7 @@ void Map_Generate(Map* map) {
                 }
 
                 for (int j = 0; j < indexs->size; j++) {
-                        int depth = max / radius;
+                        double depth = max / radius;
 
                         if (max > 0) {
                                 map->depth->value[(int)indexs->value[j]] += max - depth * dists->value[j];
@@ -55,8 +60,8 @@ void Map_Generate(Map* map) {
 double Map_GetDist(Map* map, int index0, int index1) {
         int x0 = index0 % map->width;
         int x1 = index1 % map->width;        
-        int y0 = (index0 - x0)/ map->width;
-        int y1 = (index1 - x1) / map->width;
+        double y0 = (index0 - x0)/ map->width;
+        double y1 = (index1 - x1) / map->width;
 
         double x = fabs(x0 + x1);
         double y = fabs(y0 + y1);
