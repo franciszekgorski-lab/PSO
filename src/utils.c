@@ -52,3 +52,23 @@ double Vector_Delete(Vector* v, int index) {
 
         return temp;
 }
+
+int Vector_FindMax(Vector* v) {
+        int max = 0;
+
+        for (int i = 0; i < v->size; i++) {
+                if (v->value[max] < v->value[i]) max = i;
+        }
+
+        return max;
+}
+
+int Vector_FindMin(Vector* v) {
+        int min = 0;
+
+        for (int i = 0; i < v->size; i++) {
+                if (v->value[min] > v->value[i]) min = i;
+        }
+
+        return min;
+}

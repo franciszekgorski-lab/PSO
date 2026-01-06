@@ -72,7 +72,12 @@ void Map_Print(Map* map) {
 }
 
 void Map_Visualize(Map* map) {
-        SDL_Window* window = SDL_CreateWindow("PSO", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, map->width + 180, map->heigth + 100, SDL_WINDOW_RESIZABLE);
+        SDL_Window* window = 
+                SDL_CreateWindow("PSO", 
+                SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 
+                map->width + 180, map->heigth + 80, 
+                SDL_WINDOW_RESIZABLE);
+        
         SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
         SDL_Event  event;
         int running = 1;
@@ -80,9 +85,10 @@ void Map_Visualize(Map* map) {
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         SDL_RenderClear(renderer);
 
+        double amp_p = map->depth->value[Vector_FindMax(map->depth)];
+        double amp_d = (-1 * map->depth->value[Vector_FindMin(map->depth)]);
+        //Rysowanie mapy
         for (int i = 0; i < map->depth->size; i++) {
-                double amp_p = 1500.0;
-                double amp_d = 1500.0;
                 double depth = map->depth->value[i];
                 
                 int r;
@@ -90,18 +96,18 @@ void Map_Visualize(Map* map) {
                 int b;
 
                 if (depth > 0) {
-                        r = 170 + (depth / amp_p) * 80;
-                        g = 200 - (depth / amp_p) * 30;
+                        r = 175 + (depth / amp_p) * 80;
+                        g = 160 - (depth / amp_p) * 30;
                         b = 0;
                 } else if (depth < 0) {
                         depth *= -1;
                         r = 170 - (depth / amp_d) * 80;
-                        g = 200 - (depth / amp_p) * 30;
+                        g = 160 - (depth / amp_d) * 30;
                         b = (depth / amp_d) * 40;
                 } else {
-                        r = 170;
+                        r = 175;
                         b = 0;
-                        g = 200;
+                        g = 160;
                 }
 
                 if (r > 255) r = 255;
@@ -110,6 +116,45 @@ void Map_Visualize(Map* map) {
 
                 SDL_SetRenderDrawColor(renderer, r, g, b, 255);
                 SDL_RenderDrawPoint(renderer, (i % map->width) + 80, i / map->width);
+        }
+
+        //Linie mapy
+        SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+
+        for (int i = 0; i < ((map->heigth / 100) + 1); i++) {
+                SDL_SetRenderDrawColor(renderer, 0, 0, 0, 80);
+                SDL_RenderDrawLine(renderer, 80, i * 100, 80 + map->width, i * 100);
+                SDL_SetRenderDrawColor(renderer, 0, 0, 0, 200);
+                SDL_RenderDrawLine(renderer, 75, i * 100, 80, i * 100);
+        }
+
+        for (int i = 0; i < ((map->width / 100) + 1); i++) {
+                SDL_SetRenderDrawColor(renderer, 0, 0, 0, 80);
+                SDL_RenderDrawLine(renderer, 80 + i * 100, 0, 80 + i * 100, map->heigth);
+                SDL_SetRenderDrawColor(renderer, 0, 0, 0, 200);
+                SDL_RenderDrawLine(renderer, 80 + i * 100, map->heigth, 80 + i * 100, map->heigth + 5);
+        }
+
+        //Rysowanie legendy
+        for (int i = 0; i < map->heigth; i++) {
+                int r;    // gdy 0 to 170 potem 90
+                int g;    // gdy 0 to 200 potem znowu 170
+                int b;      // gdy 0 to 0, potem 40.
+                                
+                if (i < (map->heigth / 2)) {
+                        double normalize = ((double)i / (double)(map->heigth / 2));
+                        r = 255 - (80 * normalize);
+                        g = 160 - (30 * normalize);
+                        b = 0;
+                } else {
+                        double normalize = ((double)(i - map->heigth / 2) / (double)(map->heigth / 2));
+                        r = 175 - (80.0 * normalize);
+                        g = 130 + (30.0 * normalize);
+                        b = 0 + 40.0 * (normalize);
+                }
+
+                SDL_SetRenderDrawColor(renderer, r, g, b, 255);
+                SDL_RenderDrawLine(renderer, map->width + 140, i, map->width + 180, i);
         }
 
         SDL_RenderPresent(renderer);
