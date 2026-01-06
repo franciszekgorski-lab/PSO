@@ -81,8 +81,8 @@ void Map_Visualize(Map* map) {
         SDL_RenderClear(renderer);
 
         for (int i = 0; i < map->depth->size; i++) {
-                double amp_p = 1000.0;
-                double amp_d = 1000.0;
+                double amp_p = 1500.0;
+                double amp_d = 1500.0;
                 double depth = map->depth->value[i];
                 
                 int r;
@@ -90,19 +90,23 @@ void Map_Visualize(Map* map) {
                 int b;
 
                 if (depth > 0) {
-                        r = 170 + (depth / amp_p) * 85;
-                        g = 200 - (depth / amp_p) * 180;
+                        r = 170 + (depth / amp_p) * 80;
+                        g = 200 - (depth / amp_p) * 30;
                         b = 0;
                 } else if (depth < 0) {
                         depth *= -1;
-                        r = 170 - (depth / amp_d) * 120;
-                        g = 200 - (depth / amp_d) * 150;
-                        b = (depth / amp_d) * 150;
+                        r = 170 - (depth / amp_d) * 80;
+                        g = 200 - (depth / amp_p) * 30;
+                        b = (depth / amp_d) * 40;
                 } else {
                         r = 170;
                         b = 0;
                         g = 200;
                 }
+
+                if (r > 255) r = 255;
+                if (g > 255) g = 255;
+                if (b > 255) b = 255;
 
                 SDL_SetRenderDrawColor(renderer, r, g, b, 255);
                 SDL_RenderDrawPoint(renderer, (i % map->width) + 80, i / map->width);
