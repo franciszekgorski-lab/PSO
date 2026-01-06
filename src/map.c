@@ -1,6 +1,7 @@
 #include "map.h"
 #include "utils.h"
 
+#include <SDL2/SDL.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -14,15 +15,14 @@ Map* Map_Construct(int w, int h, int max_d, int max_p) {
         temp->max_peak = max_p;
         temp->depth = Vector_Construct(w * h);
 
+        for (int i = 0; i < temp->depth->size; i++)      temp->depth->value[i] = 0;
         return temp;
 }
 
-void Map_Generate(Map* map) {
-        for (int i = 0; i < map->depth->size; i++)      map->depth->value[i] = 0;
-        
+void Map_Generate(Map* map, int multi) {
         srand(time(NULL));
 
-        int peak_count = 5 + (rand() % 10);
+        int peak_count = 5 + multi + (rand() % (10 + multi));
 
         for (int i = 0; i < peak_count; i++) {
                 Vector* dists = Vector_Construct(0);
@@ -63,8 +63,8 @@ double Map_GetDist(Map* map, int index0, int index1) {
         double y0 = (index0 - x0)/ map->width;
         double y1 = (index1 - x1) / map->width;
 
-        double x = fabs(x0 + x1);
-        double y = fabs(y0 + y1);
+        double x = fabs(x0 - x1);
+        double y = fabs(y0 - y1);
 
         return sqrt(x*x + y*y);
 }
@@ -72,6 +72,45 @@ double Map_GetDist(Map* map, int index0, int index1) {
 void Map_Print(Map* map) {
         for (int i = 0; i < map->depth->size; i++) {
                 printf("%3.1f ", map->depth->value[i]);
-                if ( i % map->width == 0 ) printf("\n");
+
+                if ( (i + 1) % map->width == 0 ) printf("\n");
+        }
+}
+
+void Map_Visualize(Map* map) {
+        SDL_Window* window = SDL_CreateWindow("PSO", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, map->width + 180, map->heigth + 100, SDL_WINDOW_RESIZABLE);
+        SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+        SDL_Event  event;
+        int running = 1;
+
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+        SDL_RenderClear(renderer);
+
+        for (int i = 0; i < map->depth->size; i++) {
+                double amp = map->max_peak - map->max_depth;
+                double depth = map->depth->value[i];
+
+                depth -= map->max_depth;
+
+                int r = (depth / amp) * 255;
+                int g = 0;
+                int b = ((amp - depth) / amp) * 255;
+
+                SDL_SetRenderDrawColor(renderer, r, g, b, 255);
+                SDL_RenderDrawPoint(renderer, (i % map->width) + 80, i / map->width);
+        }
+
+        SDL_RenderPresent(renderer);
+
+        while ( running == 1 ) {
+                while( SDL_PollEvent(&event) ) {
+                        switch(event.type) {
+                        case SDL_QUIT:
+                                running = 0;
+                                break;
+                        default:
+                                break;
+                        }
+                }
         }
 }

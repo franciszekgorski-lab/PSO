@@ -4,7 +4,8 @@
 Vector* Vector_Construct(int s) {
         Vector* temp = malloc(sizeof(Vector));
         temp->size = s;
-        temp->value = malloc(s * sizeof(double));
+        if (s != 0)     temp->value = malloc(s * sizeof(double));
+        else            temp->value = NULL;
 
         return temp;
 }
@@ -13,7 +14,10 @@ void Vector_Append(Vector* v, double value) {
         if (v == NULL) return;
 
         v->size++;
-        v->value = realloc(v->value, v->size * sizeof(double));
+
+        if (v->value != NULL) v->value = realloc(v->value, v->size * sizeof(double));
+        else v->value = malloc(v->size * sizeof(double));
+
         v->value[v->size - 1] = value;
 }
 
