@@ -58,8 +58,8 @@ double Map_GetDist(Map* map, int index0, int index1) {
         int y0 = (index0 - x0)/ map->width;
         int y1 = (index1 - x1) / map->width;
 
-        double x = fabs(x0) + fabs(x1);
-        double y = fabs(y0) + fabs(y1);
+        double x = fabs(x0 + x1);
+        double y = fabs(y0 + y1);
 
         return sqrt(x*x + y*y);
 }
