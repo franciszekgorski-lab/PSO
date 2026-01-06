@@ -7,12 +7,11 @@
 #include <math.h>
 #include <time.h>
 
-Map* Map_Construct(int w, int h, int max_d, int max_p) {
+Map* Map_Construct(int w, int h, int max_d) {
         Map* temp = malloc(sizeof(Map));
         temp->width = w;
         temp->heigth = h;
         temp->max_depth = max_d;
-        temp->max_peak = max_p;
         temp->depth = Vector_Construct(w * h);
 
         for (int i = 0; i < temp->depth->size; i++)      temp->depth->value[i] = 0;
@@ -30,7 +29,7 @@ void Map_Generate(Map* map, int multi) {
 
                 int index = rand() % map->depth->size;
                 int radius = 30 + (rand() % 100);
-                double max = (rand() % ( (map->max_depth * -1) + map->max_peak )) + (map->max_depth);
+                double max = (rand() % (map->max_depth * 2)) - (map->max_depth);
 
                 if (max == 0) {
                         i--;
@@ -46,12 +45,7 @@ void Map_Generate(Map* map, int multi) {
 
                 for (int j = 0; j < indexs->size; j++) {
                         double depth = max / radius;
-
-                        if (max > 0) {
-                                map->depth->value[(int)indexs->value[j]] += max - depth * dists->value[j];
-                        } else {
-                                map->depth->value[(int)indexs->value[j]] -= max - depth * dists->value[j];
-                        }
+                        map->depth->value[(int)indexs->value[j]] -= max - depth * dists->value[j];
                 }
         }
 
@@ -87,14 +81,28 @@ void Map_Visualize(Map* map) {
         SDL_RenderClear(renderer);
 
         for (int i = 0; i < map->depth->size; i++) {
-                double amp = map->max_peak - map->max_depth;
+                double amp_p = 1000.0;
+                double amp_d = 1000.0;
                 double depth = map->depth->value[i];
+                
+                int r;
+                int g;
+                int b;
 
-                depth -= map->max_depth;
-
-                int r = (depth / amp) * 255;
-                int g = 0;
-                int b = ((amp - depth) / amp) * 255;
+                if (depth > 0) {
+                        r = 170 + (depth / amp_p) * 85;
+                        g = 200 - (depth / amp_p) * 180;
+                        b = 0;
+                } else if (depth < 0) {
+                        depth *= -1;
+                        r = 170 - (depth / amp_d) * 120;
+                        g = 200 - (depth / amp_d) * 150;
+                        b = (depth / amp_d) * 150;
+                } else {
+                        r = 170;
+                        b = 0;
+                        g = 200;
+                }
 
                 SDL_SetRenderDrawColor(renderer, r, g, b, 255);
                 SDL_RenderDrawPoint(renderer, (i % map->width) + 80, i / map->width);
