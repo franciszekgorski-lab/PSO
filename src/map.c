@@ -7,6 +7,12 @@
 #include <math.h>
 #include <time.h>
 
+// Inicjalizacja struktury Mapy,
+//      zawiera ona wszystko potrzebne do stworzenia mapy "trzy wymiarowej" z rzutem z góry.
+//      Implementacją tej "mapy" jest tablica zmiennych double, w każdej komórce tablicy
+//      znajdziesz wartość depth (ang. głebokość) co odnosi do się ogólnego położenia
+//      punktu względem poziomu zerowego, nazwa depth nie jest więc zbyt domyślna,
+//      ale taka już jest.
 Map* Map_Construct(int w, int h, int max_d) {
         Map* temp = malloc(sizeof(Map));
         temp->width = w;
@@ -18,6 +24,19 @@ Map* Map_Construct(int w, int h, int max_d) {
         return temp;
 }
 
+// Generuje losową mapę
+//      przyjmuje strukturę mapy w której dane będą zapisywane, drugim parametrem jest liczba
+//      całkowita "multi" - definije ona minimalną oraz maksymalną ilość szczytów lub dołów
+//      nawet podając 0 za multi dalej minimalna ilość zagłębień to 5 aby nie było braków w mapie.
+//
+//      Generator ten działa następująco:
+//              - losuje ilosć szczytów lub dołów
+//              - dla każdego szczytu lub dołu:
+//                      - losuje promień zniekrztałcenia terenu
+//                      - maksymalną wartość niekrztałcenia
+//                      - oraz index komórki która będzie szczytem lub dołem
+//              - następnie zapisuje wszystkie komórki należące go tego obrębu
+//              - potem wartości depth wybranych komórek są odpowiednio modyfikowane
 void Map_Generate(Map* map, int multi) {
         srand(time(NULL));
 
@@ -48,9 +67,10 @@ void Map_Generate(Map* map, int multi) {
                         map->depth->value[(int)indexs->value[j]] -= max - depth * dists->value[j];
                 }
         }
-
 }
 
+// Oblicza odległość dwóch komórek w mapie o podanych indeksach
+//      Pitagoras =)
 double Map_GetDist(Map* map, int index0, int index1) {
         int x0 = index0 % map->width;
         int x1 = index1 % map->width;        
@@ -63,6 +83,7 @@ double Map_GetDist(Map* map, int index0, int index1) {
         return sqrt(x*x + y*y);
 }
 
+// Wyświetla wszystkie wartości komórek
 void Map_Print(Map* map) {
         for (int i = 0; i < map->depth->size; i++) {
                 printf("%3.1f ", map->depth->value[i]);
@@ -71,6 +92,11 @@ void Map_Print(Map* map) {
         }
 }
 
+// Wizualizuje mapę za pomocą biblioteki SDL2 (Simple DirectMedia Layer)
+//      tworzy okno o szerokości i wysokości odpowiadającej wielkości mapy podanej w parametrach.
+//      Deklaruje i definiuje wszyzstkie niezbędne zmienne dla SDL2 (window, renderer, event)
+//      aby wygodnie korzystać z programu.
+//      Ważniejsze części kodu wytłumaczone są wewnątrz funkcji.
 void Map_Visualize(Map* map) {
         SDL_Window* window = 
                 SDL_CreateWindow("PSO", 
@@ -87,29 +113,34 @@ void Map_Visualize(Map* map) {
 
         double amp_p = map->depth->value[Vector_FindMax(map->depth)];
         double amp_d = (-1 * map->depth->value[Vector_FindMin(map->depth)]);
+        
         //Rysowanie mapy
+        //      dla każdego pixela/komórki tablicy mamy wylosowany depth->value no i zgodnie z legendą
+        //      przyjmujemy kolejno od czerwieni dla wysoko położonych przez zieleń do niebieskiego dla
+        //      najniżej położonych punktów. LEGENDA ZMIAN KOLORU
         for (int i = 0; i < map->depth->size; i++) {
-                double depth = map->depth->value[i];
+                double depth = map->depth->value[i];    // aktualna głębokość/wysokość punktu
                 
-                int r;
+                int r;          //kolory rgb
                 int g;
                 int b;
 
-                if (depth > 0) {
+                if (depth > 0) { // gdy punkt znajduję się nad poziomem 0      <LEGENDA ZMIAN KOLORU
                         r = 175 + (depth / amp_p) * 80;
                         g = 160 - (depth / amp_p) * 30;
                         b = 0;
-                } else if (depth < 0) {
+                } else if (depth < 0) { // gdy punkt znajduję się pod poziomem zero
                         depth *= -1;
-                        r = 170 - (depth / amp_d) * 80;
+                        r = 170 - (depth / amp_d) * 80;,
                         g = 160 - (depth / amp_d) * 30;
                         b = (depth / amp_d) * 40;
-                } else {
+                } else { // zero
                         r = 175;
                         b = 0;
                         g = 160;
-                }
+                }                                       //                      LEGENDA ZMIAN KOLORU>
 
+                // jezeli wartość przekracza maksymalną to ustawiamy po prostu maks dla RGB
                 if (r > 255) r = 255;
                 if (g > 255) g = 255;
                 if (b > 255) b = 255;
@@ -121,14 +152,14 @@ void Map_Visualize(Map* map) {
         //Linie mapy
         SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
-        for (int i = 0; i < ((map->heigth / 100) + 1); i++) {
+        for (int i = 0; i <= ((map->heigth / 100) + 1); i++) {
                 SDL_SetRenderDrawColor(renderer, 0, 0, 0, 80);
                 SDL_RenderDrawLine(renderer, 80, i * 100, 80 + map->width, i * 100);
                 SDL_SetRenderDrawColor(renderer, 0, 0, 0, 200);
                 SDL_RenderDrawLine(renderer, 75, i * 100, 80, i * 100);
         }
 
-        for (int i = 0; i < ((map->width / 100) + 1); i++) {
+        for (int i = 0; i <= ((map->width / 100) + 1); i++) {
                 SDL_SetRenderDrawColor(renderer, 0, 0, 0, 80);
                 SDL_RenderDrawLine(renderer, 80 + i * 100, 0, 80 + i * 100, map->heigth);
                 SDL_SetRenderDrawColor(renderer, 0, 0, 0, 200);
@@ -137,10 +168,10 @@ void Map_Visualize(Map* map) {
 
         //Rysowanie legendy
         for (int i = 0; i < map->heigth; i++) {
-                int r;    // gdy 0 to 170 potem 90
-                int g;    // gdy 0 to 200 potem znowu 170
-                int b;      // gdy 0 to 0, potem 40.
-                                
+                int r;    // 255 -> 175 -> 95   // legenda zmian kolorystyki z góry do dołu
+                int g;    // 160 -> 130 -> 160
+                int b;    // 0   -> 0   -> 40
+                          
                 if (i < (map->heigth / 2)) {
                         double normalize = ((double)i / (double)(map->heigth / 2));
                         r = 255 - (80 * normalize);
@@ -159,6 +190,7 @@ void Map_Visualize(Map* map) {
 
         SDL_RenderPresent(renderer);
 
+        // Główna pętla, można sobie popatrzeć
         while ( running == 1 ) {
                 while( SDL_PollEvent(&event) ) {
                         switch(event.type) {
@@ -169,5 +201,6 @@ void Map_Visualize(Map* map) {
                                 break;
                         }
                 }
+                SDL_Delay(50);
         }
 }

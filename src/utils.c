@@ -1,6 +1,7 @@
 #include "utils.h"
 #include <stdlib.h>
 
+// Tworzy strukturę
 Vector* Vector_Construct(int s) {
         Vector* temp = malloc(sizeof(Vector));
         temp->size = s;
@@ -10,6 +11,7 @@ Vector* Vector_Construct(int s) {
         return temp;
 }
 
+// Dodaje element na koniec tablicy
 void Vector_Append(Vector* v, double value) {
         if (v == NULL) return;
 
@@ -21,6 +23,10 @@ void Vector_Append(Vector* v, double value) {
         v->value[v->size - 1] = value;
 }
 
+// Zmienia wielkość tablicy
+//      jeżeli nowa wielkość jest mniejsza niż poprzednia to tracone są stare elementy ;(
+//      gdy nowa wielkość jest większa to nadaje nowym elementom wartość 0
+//      zwraca starą wielkość
 int Vector_ChangeSize(Vector* v, int s) {
         if (v == NULL) return -1;
 
@@ -30,6 +36,8 @@ int Vector_ChangeSize(Vector* v, int s) {
         return temp;
 }
 
+// Wyrzuca element z końca tablicy
+//      zwraca wyrzucony element
 double Vector_Pop(Vector* v) {
         if (v == NULL) return 1;
 
@@ -43,6 +51,7 @@ double Vector_Pop(Vector* v) {
         } else return 1;
 }
 
+//Usuwanie odpowiedniego elementu
 double Vector_Delete(Vector* v, int index) {
         if (v == NULL) return 1;
 
@@ -53,6 +62,8 @@ double Vector_Delete(Vector* v, int index) {
         return temp;
 }
 
+//Szukanie największej wartości w tablicy
+//      zwraca jej indeks
 int Vector_FindMax(Vector* v) {
         int max = 0;
 
@@ -63,6 +74,8 @@ int Vector_FindMax(Vector* v) {
         return max;
 }
 
+//Szukanie najmniejszej wartości w tablicy
+//      zwraca jej indeks
 int Vector_FindMin(Vector* v) {
         int min = 0;
 
