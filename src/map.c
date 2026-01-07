@@ -77,7 +77,7 @@ double Map_GetDist(Map* map, int index0, int index1) {
         double y0 = (index0 - x0)/ map->width;
         double y1 = (index1 - x1) / map->width;
 
-        double x = fabs(x0 - x1);
+        double x = fabs((double)(x0 - x1));
         double y = fabs(y0 - y1);
 
         return sqrt(x*x + y*y);
@@ -131,7 +131,7 @@ void Map_Visualize(Map* map) {
                         b = 0;
                 } else if (depth < 0) { // gdy punkt znajduję się pod poziomem zero
                         depth *= -1;
-                        r = 170 - (depth / amp_d) * 80;,
+                        r = 170 - (depth / amp_d) * 80;
                         g = 160 - (depth / amp_d) * 30;
                         b = (depth / amp_d) * 40;
                 } else { // zero
