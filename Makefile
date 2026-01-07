@@ -9,7 +9,7 @@ OBJ = $(SRC:.c=.o)
 all: $(TARGET)
 
 $(TARGET): $(OBJ)
-	$(COMP) $(OBJ) -o $@ $(LD_FLAGS) -lSDL2
+	$(COMP) $(OBJ) -o $@ $(LD_FLAGS) -lSDL2 -lSDL2_ttf
 
 %.o: %.c
 	$(COMP) $(COMP_FLAGS) -c $< -o $@
