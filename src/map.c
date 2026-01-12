@@ -68,8 +68,8 @@ void Map_Generate(Map* map, int multi) {
                         map->depth->value[(int)indexs->value[j]] -= max - depth * dists->value[j];
                 }
 
-                //free(dists);
-                //free(indexs);
+                Vector_Destroy(dists);
+                Vector_Destroy(indexs);
         }
 }
 
@@ -261,6 +261,9 @@ void Map_Visualize(Map* map) {
                 }
                 SDL_Delay(50);
         }
+
+        SDL_DestroyRenderer(renderer);
+        SDL_DestroyWindow(window);
 }
 
 void Map_Destroy(Map* map) {
