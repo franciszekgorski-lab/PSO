@@ -22,6 +22,8 @@ int main(int argc, char** argv) {
         Map_Generate(map, multi);
 
         Map_Visualize(map);
+        
+        //Map_Destroy(map);
 
         SDL_Quit();
         return 0;

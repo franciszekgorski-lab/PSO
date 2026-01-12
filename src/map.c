@@ -67,6 +67,9 @@ void Map_Generate(Map* map, int multi) {
                         double depth = max / radius;
                         map->depth->value[(int)indexs->value[j]] -= max - depth * dists->value[j];
                 }
+
+                //free(dists);
+                //free(indexs);
         }
 }
 
@@ -92,6 +95,7 @@ void Map_Print(Map* map) {
                 if ( (i + 1) % map->width == 0 ) printf("\n");
         }
 }
+
 /*
 void draw_text(SDL_Renderer* renderer,
         TTF_Font* font, const char* text,
@@ -164,17 +168,17 @@ void Map_Visualize(Map* map) {
 
                 if (depth > 0) { // gdy punkt znajduję się nad poziomem 0      <LEGENDA ZMIAN KOLORU
                         r = 175 + (depth / amp_p) * 80;
-                        g = 160 - (depth / amp_p) * 30;
+                        g = 150 - (depth / amp_p) * 30;
                         b = 0;
                 } else if (depth < 0) { // gdy punkt znajduję się pod poziomem zero
                         depth *= -1;
                         r = 170 - (depth / amp_d) * 80;
-                        g = 160 - (depth / amp_d) * 30;
+                        g = 150 - (depth / amp_d) * 30;
                         b = (depth / amp_d) * 40;
                 } else { // zero
                         r = 175;
                         b = 0;
-                        g = 160;
+                        g = 150;
                 }                                       //                      LEGENDA ZMIAN KOLORU>
 
                 // jezeli wartość przekracza maksymalną to ustawiamy po prostu maks dla RGB
@@ -195,6 +199,8 @@ void Map_Visualize(Map* map) {
         
         SDL_Rect dstrect = {70, 70, map->width, map->heigth};
         SDL_RenderCopy(renderer, texture, NULL, &dstrect);
+        
+        //free(pixels);
 
         //Linie mapy / numerkiii
         //SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
@@ -255,4 +261,9 @@ void Map_Visualize(Map* map) {
                 }
                 SDL_Delay(50);
         }
+}
+
+void Map_Destroy(Map* map) {
+        Vector_Destroy(map->depth);
+        free(map);
 }

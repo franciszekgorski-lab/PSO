@@ -16,5 +16,6 @@ double Vector_Pop(Vector* v);                      //zwraca usuniętą wartość
 double Vector_Delete(Vector* v, int index);        //zwraca usuniętą wartość
 int Vector_FindMax(Vector* v);
 int Vector_FindMin(Vector* v);
+void Vector_Destroy(Vector* v);
 
 #endif

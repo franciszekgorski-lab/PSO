@@ -85,3 +85,9 @@ int Vector_FindMin(Vector* v) {
 
         return min;
 }
+
+void Vector_Destroy(Vector* v) {
+        if (v == NULL) return;
+        if (v->value != NULL) free(v->value);
+        free(v);
+}

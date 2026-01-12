@@ -15,5 +15,6 @@ void Map_Generate(Map* map, int multi);
 double Map_GetDist(Map* map, int index0, int index1);
 void Map_Print(Map* map);
 void Map_Visualize(Map* map);
+void Map_Destroy(Map* map);
 
 #endif
