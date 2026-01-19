@@ -2,11 +2,13 @@
 #include "utils.h"
 
 #include <SDL2/SDL.h>
-//#include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_ttf.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include <time.h>
+
+#define MAP_SIZE 800
 
 // Inicjalizacja struktury Mapy,
 //      zawiera ona wszystko potrzebne do stworzenia mapy "trzy wymiarowej" z rzutem z góry.
@@ -48,7 +50,7 @@ void Map_Generate(Map* map, int multi) {
                 Vector* indexs = Vector_Construct(0);
 
                 int index = rand() % map->depth->size;
-                int radius = 30 + (rand() % map->max_depth);
+                int radius = (map->width/20) + (rand() % map->max_depth);
                 double max = (rand() % (map->max_depth * 2)) - (map->max_depth);
 
                 if (max == 0) {
@@ -96,9 +98,9 @@ void Map_Print(Map* map) {
         }
 }
 
-/*
-void draw_text(SDL_Renderer* renderer,
-        TTF_Font* font, const char* text,
+
+void draw_text(SDL_Renderer* renderer, TTF_Font* font,
+        const char* text,
         int x, int y,
         SDL_Color color) {
 
@@ -112,7 +114,8 @@ void draw_text(SDL_Renderer* renderer,
         SDL_FreeSurface(surface);
         SDL_DestroyTexture(texture);
 }
-*/
+
+
 // Wizualizuje mapę za pomocą biblioteki SDL2 (Simple DirectMedia Layer)
 //      tworzy okno o szerokości i wysokości odpowiadającej wielkości mapy podanej w parametrach.
 //      Deklaruje i definiuje wszyzstkie niezbędne zmienne dla SDL2 (window, renderer, event)
@@ -122,22 +125,22 @@ void Map_Visualize(Map* map) {
         SDL_Window* window = 
                 SDL_CreateWindow("PSO", 
                 SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 
-                map->width + 180, map->heigth + 140, 
+                MAP_SIZE + 180, MAP_SIZE + 140, 
                 SDL_WINDOW_RESIZABLE);
         
         SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-        SDL_Event  event;
+        SDL_Event event;
         int running = 1;
 
-        //TTF_Init();
-        //TTF_Font* font = TTF_OpenFont("fonts/arial.ttf", 24);
+        TTF_Init();
+        TTF_Font* font = TTF_OpenFont("fonts/arial.ttf", 24);
 
-        /*
+        
         if (!font) {
                 printf("Błąd ładowania czcionki: %s\n", TTF_GetError());
                 return;
         }
-        */
+        
 
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         SDL_RenderClear(renderer);
@@ -189,60 +192,108 @@ void Map_Visualize(Map* map) {
                 //NOWY RYSOWANIE
 
                 pixels[i] = (0xFF << 24) | (r << 16) | (g << 8) | b;
-                
-                //STARE RYSOWANIE
-                //SDL_SetRenderDrawColor(renderer, r, g, b, 255);
-                //SDL_RenderDrawPoint(renderer, (i % map->width) + 80, i / map->width);
         }
 
         SDL_UnlockTexture(texture);
         
-        SDL_Rect dstrect = {70, 70, map->width, map->heigth};
+        SDL_Rect dstrect = {70, 70, MAP_SIZE, MAP_SIZE};
         SDL_RenderCopy(renderer, texture, NULL, &dstrect);
         
-        //free(pixels);
-
         //Linie mapy / numerkiii
-        //SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-        //SDL_Color black = {255, 0, 0, 0};
-        //char buffer[20];
+        SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+        SDL_Color black = {10, 10, 10, 0};
+        char buffer[20] = "jd";
 
-        for (int i = 0; i <= map->heigth / 100; i++) {
-                //sprintf()
-                //draw_text(renderer, font, buffer, 30, 70 + (i * 100), black);
-                SDL_SetRenderDrawColor(renderer, 0, 0, 0, 80);
-                SDL_RenderDrawLine(renderer, 70, 70 + (i * 100), 70 + map->width, 70 + (i * 100));
-                SDL_SetRenderDrawColor(renderer, 0, 0, 0, 200);
-                SDL_RenderDrawLine(renderer, 65, 70 + i * 100, 70, 70 + i * 100);
+        for (int i = 0; i < map->heigth; i += map->heigth/10) {
+                int h = MAP_SIZE + 70 - (((double)i / (double)map->heigth) * MAP_SIZE);
+                sprintf(buffer, "%d", i);
+                draw_text(renderer, font, buffer, 25, h - 15, black);
+                
+                SDL_SetRenderDrawColor(renderer, 0, 0, 0, 40);
+                SDL_RenderDrawLine(renderer, 70, h, 70 + MAP_SIZE, h);
+                SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+                SDL_RenderDrawLine(renderer, 65, h, 70, h);
         }
 
-        for (int i = 0; i <= ((map->width / 100) + 0); i++) {
+        for (int i = 0; i < map->width; i += map->width/10) {
+                int w = 70 + (((double)i / (double)map->width) * MAP_SIZE);
+                sprintf(buffer, "%d", i);
+                draw_text(renderer, font, buffer, w, MAP_SIZE + 70, black);
+                
                 SDL_SetRenderDrawColor(renderer, 0, 0, 0, 80);
-                SDL_RenderDrawLine(renderer, 70 + i * 100, 70, 70 + i * 100, map->heigth + 70);
-                SDL_SetRenderDrawColor(renderer, 0, 0, 0, 200);
-                SDL_RenderDrawLine(renderer, 70 + i * 100, map->heigth + 70, 70 + i * 100, map->heigth + 75);
+                SDL_RenderDrawLine(renderer, w, 70, w, MAP_SIZE + 70);
+                SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+                SDL_RenderDrawLine(renderer, w, MAP_SIZE + 70, w, MAP_SIZE + 75);
         }
 
         //Rysowanie legendy
-        for (int i = 0; i < map->heigth; i++) {
+        for (int i = 0; i < MAP_SIZE; i++) {
                 int r;    // 255 -> 175 -> 95   // legenda zmian kolorystyki z góry do dołu
-                int g;    // 160 -> 130 -> 160
+                int g;    // 150 -> 120 -> 150
                 int b;    // 0   -> 0   -> 40
                           
-                if (i < (map->heigth / 2)) {
-                        double normalize = ((double)i / (double)(map->heigth / 2));
+                if (i < (MAP_SIZE / 2)) {
+                        double normalize = ((double)i / (double)(MAP_SIZE / 2));
                         r = 255 - (80 * normalize);
-                        g = 160 - (30 * normalize);
+                        g = 150 - (30 * normalize);
                         b = 0;
                 } else {
-                        double normalize = ((double)(i - map->heigth / 2) / (double)(map->heigth / 2));
+                        double normalize = ((double)(i - MAP_SIZE / 2) / (double)(MAP_SIZE / 2));
                         r = 175 - (80.0 * normalize);
-                        g = 130 + (30.0 * normalize);
+                        g = 120 + (30.0 * normalize);
                         b = 0 + 40.0 * (normalize);
                 }
 
+                // jezeli wartość przekracza maksymalną to ustawiamy po prostu maks dla RGB
+                if (r > 255) r = 255;
+                if (g > 255) g = 255;
+                if (b > 255) b = 255;
+
                 SDL_SetRenderDrawColor(renderer, r, g, b, 255);
-                SDL_RenderDrawLine(renderer, map->width + 140, i, map->width + 180, i);
+                SDL_RenderDrawLine(renderer, MAP_SIZE + 140, i + 70, MAP_SIZE + 180, i + 70);
+        }
+
+        int index_min = Vector_FindMin(map->depth);
+        int index_max = Vector_FindMax(map->depth);
+        double max = map->depth->value[index_max];
+        double min = map->depth->value[index_min];
+       
+        double whole = max - min; 
+
+        for (int i = 0; i <= MAP_SIZE / 100; i++) {
+                int x = 135 + MAP_SIZE;
+                int y = MAP_SIZE + 70 - (i * 100);
+
+                sprintf(buffer, "%.1f", min + (whole * ((double)i / (double)(MAP_SIZE / 100))) );
+                draw_text(renderer, font, buffer, x - 50, y, black);
+                SDL_SetRenderDrawColor(renderer, 0, 0, 0, 80);
+                SDL_RenderDrawLine(renderer, x, y, x + 45, y);
+        }
+
+        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+
+        //Peak
+        {
+                SDL_Rect dst;
+                dst.w = 11; dst.h = 11;
+                dst.x = 65 + (index_max % map->width) * (MAP_SIZE / map->width);
+                dst.y = 65 + (index_max / map->width) * (MAP_SIZE / map->heigth);
+                SDL_RenderFillRect(renderer, &dst);
+                
+                sprintf(buffer, "%.1f", map->depth->value[index_max]);
+                draw_text(renderer, font, buffer, dst.x - 30, dst.y + 10, black);
+        }
+
+        //Lowest
+        {
+                SDL_Rect dst;
+                dst.w = 11; dst.h = 11;
+                dst.x = 65 + (index_min % map->width) * (MAP_SIZE / map->width);
+                dst.y = 65 + (index_min / map->width) * (MAP_SIZE / map->heigth);
+                SDL_RenderFillRect(renderer, &dst);
+                
+                sprintf(buffer, "%.1f", map->depth->value[index_min]);
+                draw_text(renderer, font, buffer, dst.x - 30, dst.y + 10, black);
         }
 
         SDL_RenderPresent(renderer);
