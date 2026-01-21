@@ -23,6 +23,8 @@ int main(int argc, char** argv) {
 
         Map_Visualize(map);
         
+        Map_Print(map);
+
         Map_Destroy(map);
 
         SDL_Quit();

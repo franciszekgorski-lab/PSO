@@ -43,14 +43,14 @@ Map* Map_Construct(int w, int h, int max_d) {
 void Map_Generate(Map* map, int multi) {
         srand(time(NULL));
 
-        int peak_count = 5 + multi + (rand() % (10 + multi));
+        int peak_count = rand() % (multi);
 
         for (int i = 0; i < peak_count; i++) {
                 Vector* dists = Vector_Construct(0);
                 Vector* indexs = Vector_Construct(0);
 
                 int index = rand() % map->depth->size;
-                int radius = (map->width/20) + (rand() % map->max_depth);
+                int radius = rand() % map->max_depth;
                 double max = (rand() % (map->max_depth * 2)) - (map->max_depth);
 
                 if (max == 0) {
@@ -169,7 +169,7 @@ void Map_Visualize(Map* map) {
                 int g;
                 int b;
 
-                if (depth > 0) { // gdy punkt znajduję się nad poziomem 0      <LEGENDA ZMIAN KOLORU
+                if (depth > 0) { // gdy punkt znajduję się nad poziomem 0      
                         r = 175 + (depth / amp_p) * 80;
                         g = 150 - (depth / amp_p) * 30;
                         b = 0;
@@ -182,7 +182,7 @@ void Map_Visualize(Map* map) {
                         r = 175;
                         b = 0;
                         g = 150;
-                }                                       //                      LEGENDA ZMIAN KOLORU>
+                }                      
 
                 // jezeli wartość przekracza maksymalną to ustawiamy po prostu maks dla RGB
                 if (r > 255) r = 255;
@@ -202,7 +202,7 @@ void Map_Visualize(Map* map) {
         //Linie mapy / numerkiii
         SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
         SDL_Color black = {10, 10, 10, 0};
-        char buffer[20] = "jd";
+        char buffer[20];
 
         for (int i = 0; i < map->heigth; i += map->heigth/10) {
                 int h = MAP_SIZE + 70 - (((double)i / (double)map->heigth) * MAP_SIZE);
@@ -226,6 +226,11 @@ void Map_Visualize(Map* map) {
                 SDL_RenderDrawLine(renderer, w, MAP_SIZE + 70, w, MAP_SIZE + 75);
         }
 
+        int index_min = Vector_FindMin(map->depth);
+        int index_max = Vector_FindMax(map->depth);
+        double max = map->depth->value[index_max];
+        double min = map->depth->value[index_min];
+
         //Rysowanie legendy
         for (int i = 0; i < MAP_SIZE; i++) {
                 int r;    // 255 -> 175 -> 95   // legenda zmian kolorystyki z góry do dołu
@@ -242,7 +247,7 @@ void Map_Visualize(Map* map) {
                         r = 175 - (80.0 * normalize);
                         g = 120 + (30.0 * normalize);
                         b = 0 + 40.0 * (normalize);
-                }
+                }                        
 
                 // jezeli wartość przekracza maksymalną to ustawiamy po prostu maks dla RGB
                 if (r > 255) r = 255;
@@ -253,11 +258,6 @@ void Map_Visualize(Map* map) {
                 SDL_RenderDrawLine(renderer, MAP_SIZE + 140, i + 70, MAP_SIZE + 180, i + 70);
         }
 
-        int index_min = Vector_FindMin(map->depth);
-        int index_max = Vector_FindMax(map->depth);
-        double max = map->depth->value[index_max];
-        double min = map->depth->value[index_min];
-       
         double whole = max - min; 
 
         for (int i = 0; i <= MAP_SIZE / 100; i++) {
@@ -278,8 +278,11 @@ void Map_Visualize(Map* map) {
                 dst.w = 11; dst.h = 11;
                 dst.x = 65 + (index_max % map->width) * (MAP_SIZE / map->width);
                 dst.y = 65 + (index_max / map->width) * (MAP_SIZE / map->heigth);
-                SDL_RenderFillRect(renderer, &dst);
+                dst.x += ( (MAP_SIZE / map->width) / 2);
+                dst.y += ( (MAP_SIZE / map->heigth) / 2);
                 
+                SDL_RenderFillRect(renderer, &dst);
+
                 sprintf(buffer, "%.1f", map->depth->value[index_max]);
                 draw_text(renderer, font, buffer, dst.x - 30, dst.y + 10, black);
         }
@@ -290,6 +293,9 @@ void Map_Visualize(Map* map) {
                 dst.w = 11; dst.h = 11;
                 dst.x = 65 + (index_min % map->width) * (MAP_SIZE / map->width);
                 dst.y = 65 + (index_min / map->width) * (MAP_SIZE / map->heigth);
+                dst.x += ( (MAP_SIZE / map->width) / 2);
+                dst.y += ( (MAP_SIZE / map->heigth) / 2);
+                
                 SDL_RenderFillRect(renderer, &dst);
                 
                 sprintf(buffer, "%.1f", map->depth->value[index_min]);
