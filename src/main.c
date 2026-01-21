@@ -10,14 +10,16 @@ int main(int argc, char** argv) {
                 return 1;
         }
 
-        if (argc != 5) return 1;
+        if (argc != 6) return 1;
+        if (argv[3] == 0) return 1;
 
         int w           = atoi(argv[1]);
         int h           = atoi(argv[2]);
-        int max_depth   = atoi(argv[3]);
-        int multi       = atoi(argv[4]);
+        int max_r       = atoi(argv[3]);
+        int max_h       = atoi(argv[4]);
+        int multi       = atoi(argv[5]);
 
-        Map* map = Map_Construct(w, h, max_depth);
+        Map* map = Map_Construct(w, h, max_h, max_r);
 
         Map_Generate(map, multi);
 

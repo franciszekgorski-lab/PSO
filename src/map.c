@@ -16,11 +16,12 @@
 //      znajdziesz wartość depth (ang. głebokość) co odnosi do się ogólnego położenia
 //      punktu względem poziomu zerowego, nazwa depth nie jest więc zbyt domyślna,
 //      ale taka już jest.
-Map* Map_Construct(int w, int h, int max_d) {
+Map* Map_Construct(int w, int h, int max_d, int max_r) {
         Map* temp = malloc(sizeof(Map));
         temp->width = w;
         temp->heigth = h;
-        temp->max_depth = max_d;
+        temp->max_h = max_d;
+        temp->max_r = max_r;
         temp->depth = Vector_Construct(w * h);
 
         for (int i = 0; i < temp->depth->size; i++)      temp->depth->value[i] = 0;
@@ -43,15 +44,15 @@ Map* Map_Construct(int w, int h, int max_d) {
 void Map_Generate(Map* map, int multi) {
         srand(time(NULL));
 
-        int peak_count = rand() % (multi);
+        int peak_count = multi;
 
         for (int i = 0; i < peak_count; i++) {
                 Vector* dists = Vector_Construct(0);
                 Vector* indexs = Vector_Construct(0);
 
                 int index = rand() % map->depth->size;
-                int radius = rand() % map->max_depth;
-                double max = (rand() % (map->max_depth * 2)) - (map->max_depth);
+                int radius = map->max_r > 1 ? rand() % map->max_r: 1;
+                double max = (rand() % (map->max_h * 2)) - (map->max_h);
 
                 if (max == 0) {
                         i--;

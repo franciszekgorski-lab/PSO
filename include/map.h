@@ -6,11 +6,12 @@
 typedef struct _map{
         int width;
         int heigth;
-        int max_depth;
+        int max_h;
+        int max_r;
         Vector* depth;
 } Map;
 
-Map* Map_Construct(int w, int h, int max_d);
+Map* Map_Construct(int w, int h, int max_h, int max_r);
 void Map_Generate(Map* map, int multi);
 double Map_GetDist(Map* map, int index0, int index1);
 void Map_Print(Map* map);
