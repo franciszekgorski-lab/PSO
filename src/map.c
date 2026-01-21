@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <time.h>
+#include <string.h>
 
 #define MAP_SIZE 800
 
@@ -16,15 +17,47 @@
 //      znajdziesz wartość depth (ang. głebokość) co odnosi do się ogólnego położenia
 //      punktu względem poziomu zerowego, nazwa depth nie jest więc zbyt domyślna,
 //      ale taka już jest.
-Map* Map_Construct(int w, int h, int max_d, int max_r) {
+Map* Map_Construct(int w, int h, int x_r, int n_r, int x_h, int n_h, int m) {
         Map* temp = malloc(sizeof(Map));
         temp->width = w;
         temp->heigth = h;
-        temp->max_h = max_d;
-        temp->max_r = max_r;
+        temp->max_h = x_h;
+        temp->min_h = n_h;
+        temp->max_r = x_r;
+        temp->min_r = n_r;
+        temp->multi = m;
         temp->depth = Vector_Construct(w * h);
 
         for (int i = 0; i < temp->depth->size; i++)      temp->depth->value[i] = 0;
+        return temp;
+}
+
+Map* Map_LoadFromSettings(const char* file_name) {
+        FILE* settings = fopen(file_name, "r");
+        char buffer[40];
+        int value;
+
+        int width;
+        int heigth;
+        int h_max;
+        int h_min;
+        int radius_max;
+        int radius_min;
+        int multi;
+
+        if (settings == NULL) return NULL;
+        
+        while ( fscanf(settings, "%s %d", buffer, &value) == 2) {
+                if (strcmp(buffer, "width") == 0) width = value;
+                if (strcmp(buffer, "heigth") == 0) heigth = value;
+                if (strcmp(buffer, "h_max") == 0) h_max = value;
+                if (strcmp(buffer, "h_min") == 0) h_min = value;
+                if (strcmp(buffer, "radius_max") == 0) radius_max = value;
+                if (strcmp(buffer, "radius_min") == 0) radius_min = value;
+                if (strcmp(buffer, "multi") == 0) multi = value;
+        }
+
+        Map* temp = Map_Construct(width, heigth, radius_max, radius_min, h_max, h_min, multi);
         return temp;
 }
 
@@ -41,18 +74,17 @@ Map* Map_Construct(int w, int h, int max_d, int max_r) {
 //                      - oraz index komórki która będzie szczytem lub dołem
 //              - następnie zapisuje wszystkie komórki należące go tego obrębu
 //              - potem wartości depth wybranych komórek są odpowiednio modyfikowane
-void Map_Generate(Map* map, int multi) {
+void Map_Generate(Map* map) {
         srand(time(NULL));
 
-        int peak_count = multi;
-
-        for (int i = 0; i < peak_count; i++) {
+        for (int i = 0; i < map->multi; i++) {
                 Vector* dists = Vector_Construct(0);
                 Vector* indexs = Vector_Construct(0);
 
                 int index = rand() % map->depth->size;
-                int radius = map->max_r > 1 ? rand() % map->max_r: 1;
-                double max = (rand() % (map->max_h * 2)) - (map->max_h);
+                int radius = map->min_r + (rand() % (map->max_r - map->min_r));
+                double max = map->min_h + (rand() % (map->max_h - map->min_h));
+                if (rand() % 2) max *= - 1;
 
                 if (max == 0) {
                         i--;

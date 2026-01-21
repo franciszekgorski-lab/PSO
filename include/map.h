@@ -7,12 +7,16 @@ typedef struct _map{
         int width;
         int heigth;
         int max_h;
+        int min_h;
         int max_r;
+        int min_r;
+        int multi;
         Vector* depth;
 } Map;
 
-Map* Map_Construct(int w, int h, int max_h, int max_r);
-void Map_Generate(Map* map, int multi);
+Map* Map_Construct(int w, int h, int x_r, int n_r, int x_h, int n_h, int m);
+Map* Map_LoadFromSettings(const char* file_name);
+void Map_Generate(Map* map);
 double Map_GetDist(Map* map, int index0, int index1);
 void Map_Print(Map* map);
 void Map_Visualize(Map* map);
