@@ -68,9 +68,9 @@ int main(int argc, char** argv) {
         if ( do_generate ) Map_Generate(map);
 
         Map_Visualize(map);
+
         if ( do_save ) Map_Save(map);
         
         Map_Destroy(map);
-        SDL_Quit();
         return 0;
 }

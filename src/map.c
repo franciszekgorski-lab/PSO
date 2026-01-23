@@ -159,10 +159,7 @@ void Map_Print(Map* map) {
 }
 
 
-void draw_text(SDL_Renderer* renderer, TTF_Font* font,
-        const char* text,
-        int x, int y,
-        SDL_Color color) {
+void draw_text(SDL_Renderer* renderer, TTF_Font* font, const char* text, int x, int y, SDL_Color color) {
 
         SDL_Surface* surface = TTF_RenderText_Blended(font, text, color);
         SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
@@ -364,7 +361,8 @@ void Map_Visualize(Map* map) {
 
         SDL_RenderPresent(renderer);
         SDL_DestroyTexture(texture);
-        
+        free(pixels);
+
         // Główna pętla, można sobie popatrzeć
         while ( running == 1 ) {
                 while( SDL_PollEvent(&event) ) {
@@ -381,6 +379,9 @@ void Map_Visualize(Map* map) {
 
         SDL_DestroyRenderer(renderer);
         SDL_DestroyWindow(window);
+        TTF_CloseFont(font);
+
+        SDL_Quit();
 }
 
 void Map_Destroy(Map* map) {
