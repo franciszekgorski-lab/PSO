@@ -361,7 +361,6 @@ void Map_Visualize(Map* map) {
 
         SDL_RenderPresent(renderer);
         SDL_DestroyTexture(texture);
-        free(pixels);
 
         // Główna pętla, można sobie popatrzeć
         while ( running == 1 ) {
