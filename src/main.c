@@ -30,7 +30,14 @@ int main(int argc, char** argv) {
         while ( (opt = getopt_long(argc, argv, "ho:l:s:", long_options, &option_index)) != -1 ) {
                 switch (opt) {
                 case 'h':
-                        //wstawić instrukcję obsługi
+                        printf("                ___help___                 \n");
+                        printf("Dostępne opcje:\n\n");
+                        printf("        settings [nazwa pliku]:\n");
+                        printf("Wczytuje plik z ustawieniami do generacji mapy.\n\n");
+                        printf("        load [nazwa pliku]:\n");
+                        printf("Wczytuje plik z mapą w formie wartości każdej komórki rozdzielonej spacją.\n\n");
+                        printf("        save [nazwa pliku]:\n");
+                        printf("Zapisuje mapę do pliku txt\n\n");
                         return 1;
                         break;
 
