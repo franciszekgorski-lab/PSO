@@ -1,5 +1,6 @@
 #include <SDL2/SDL.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "map.h"
 
@@ -10,16 +11,27 @@ int main(int argc, char** argv) {
                 return 1;
         }
 
-        if (argc != 2) return 1;
-
         Map* map = Map_LoadFromSettings(argv[1]);
+        
+        if ( map == NULL ) {
+                printf("Brak mapy!\n");
+                return 1;
+        }
 
-        Map_Generate(map);
+        if ( strcmp(argv[2], "generate") == 0 ) Map_Generate(map);
+        else if ( strcmp(argv[2], "load") == 0 ) {
+                if ( argc != 4 ) {
+                        printf("Nie podano nazwy pliku z zapisem mapy!\n");
+                        return 1;
+                }
+                
+                if ( Map_Load(map, argv[3]) ) return 1;
+        } else    printf("Wrong second argument; [generate/load]\n");
 
         Map_Visualize(map);
+        Map_Save(map);
         
         Map_Destroy(map);
-
         SDL_Quit();
         return 0;
 }

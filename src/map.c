@@ -32,8 +32,8 @@ Map* Map_Construct(int w, int h, int x_r, int n_r, int x_h, int n_h, int m) {
         return temp;
 }
 
-Map* Map_LoadFromSettings(const char* file_name) {
-        FILE* settings = fopen(file_name, "r");
+Map* Map_LoadFromSettings(const char* file_path) {
+        FILE* settings = fopen(file_path, "r");
         char buffer[40];
         int value;
 
@@ -45,8 +45,11 @@ Map* Map_LoadFromSettings(const char* file_name) {
         int radius_min;
         int multi;
 
-        if (settings == NULL) return NULL;
-        
+        if (settings == NULL) {
+                printf("Błąd wczytywania ustawień mapy z pliku!\n");        
+                return NULL;
+        }
+
         while ( fscanf(settings, "%s %d", buffer, &value) == 2) {
                 if (strcmp(buffer, "width") == 0) width = value;
                 if (strcmp(buffer, "heigth") == 0) heigth = value;
@@ -106,6 +109,24 @@ void Map_Generate(Map* map) {
                 Vector_Destroy(dists);
                 Vector_Destroy(indexs);
         }
+}
+
+int Map_Load(Map* map, const char* file_path) {
+        FILE* save = fopen(file_path, "r");
+
+        if (save == NULL) {
+                printf("Błąd przy czytaniu mapy z pliku!\n");
+                return 1;
+        }
+
+        int counter = 0;
+        double buf = 0;
+        while ( fscanf(save, "%lf", &buf) == 1) {
+                map->depth->value[counter] = buf;
+                counter++;
+        }
+
+        return 0;
 }
 
 // Oblicza odległość dwóch komórek w mapie o podanych indeksach
@@ -206,9 +227,9 @@ void Map_Visualize(Map* map) {
                         r = 175 + (depth / amp_p) * 80;
                         g = 150 - (depth / amp_p) * 30;
                         b = 0;
-                } else if (depth < 0) { // gdy punkt znajduję się pod poziomem zero
+               } else if (depth < 0) { // gdy punkt znajduję się pod poziomem zero
                         depth *= -1;
-                        r = 170 - (depth / amp_d) * 80;
+                        r = 175 - (depth / amp_d) * 80;
                         g = 150 - (depth / amp_d) * 30;
                         b = (depth / amp_d) * 40;
                 } else { // zero
@@ -273,13 +294,13 @@ void Map_Visualize(Map* map) {
                 if (i < (MAP_SIZE / 2)) {
                         double normalize = ((double)i / (double)(MAP_SIZE / 2));
                         r = 255 - (80 * normalize);
-                        g = 150 - (30 * normalize);
+                        g = 120 + (30 * normalize);
                         b = 0;
                 } else {
                         double normalize = ((double)(i - MAP_SIZE / 2) / (double)(MAP_SIZE / 2));
                         r = 175 - (80.0 * normalize);
-                        g = 120 + (30.0 * normalize);
-                        b = 0 + 40.0 * (normalize);
+                        g = 150 + (30.0 * normalize);
+                        b = 40.0 * (normalize);
                 }                        
 
                 // jezeli wartość przekracza maksymalną to ustawiamy po prostu maks dla RGB
@@ -359,4 +380,20 @@ void Map_Visualize(Map* map) {
 void Map_Destroy(Map* map) {
         Vector_Destroy(map->depth);
         free(map);
+}
+
+void Map_Save(Map* map) {
+        FILE* save = fopen("save", "w");
+
+        if ( save == NULL ) {
+                printf("Błąd przy zapisie mapy!\n");
+                return;
+        }
+
+        for (int i = 0; i < map->depth->size; i++) {
+                fprintf(save, " %.3lf", map->depth->value[i]);
+                if (!((i + 1) % map->width)) fprintf(save, "\n");
+        }
+
+        fclose(save);
 }
