@@ -111,22 +111,28 @@ void Map_Generate(Map* map) {
         }
 }
 
-int Map_Load(Map* map, const char* file_path) {
+Map* Map_Load(const char* file_path) {
         FILE* save = fopen(file_path, "r");
+        Map* temp = malloc(sizeof(Map));
 
         if (save == NULL) {
                 printf("Błąd przy czytaniu mapy z pliku!\n");
-                return 1;
+                return NULL;
         }
 
         int counter = 0;
         double buf = 0;
+
+        fscanf(save, "%d", &temp->width);
+        fscanf(save, "%d", &temp->heigth);
+        temp->depth = Vector_Construct(temp->width * temp->heigth);
+
         while ( fscanf(save, "%lf", &buf) == 1) {
-                map->depth->value[counter] = buf;
+                temp->depth->value[counter] = buf;
                 counter++;
         }
 
-        return 0;
+        return temp;
 }
 
 // Oblicza odległość dwóch komórek w mapie o podanych indeksach
@@ -389,6 +395,8 @@ void Map_Save(Map* map) {
                 printf("Błąd przy zapisie mapy!\n");
                 return;
         }
+
+        fprintf(save, "%d %d\n", map->width, map->heigth);
 
         for (int i = 0; i < map->depth->size; i++) {
                 fprintf(save, " %.3lf", map->depth->value[i]);
