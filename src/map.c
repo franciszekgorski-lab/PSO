@@ -61,6 +61,16 @@ Map* Map_LoadFromSettings(const char* file_path) {
         }
 
         Map* temp = Map_Construct(width, heigth, radius_max, radius_min, h_max, h_min, multi);
+        
+        if (width < 2 || heigth < 2) {
+                printf("Zbyt małe rozmiary mapy!");
+                return NULL;
+        }
+
+        if (width > 800 || heigth > 800) {
+                printf("Zbyt duże rozmiary mapy!");
+                return NULL;
+        }
         return temp;
 }
 
