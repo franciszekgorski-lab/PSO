@@ -303,7 +303,7 @@ void Map_Visualize(Map* map) {
                 } else {
                         double normalize = ((double)(i - MAP_SIZE / 2) / (double)(MAP_SIZE / 2));
                         r = 175 - (80.0 * normalize);
-                        g = 150 + (30.0 * normalize);
+                        g = 150 - (30.0 * normalize);
                         b = 40.0 * (normalize);
                 }                        
 
