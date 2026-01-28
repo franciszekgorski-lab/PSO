@@ -1,15 +1,15 @@
 COMP = gcc
 COMP_FLAGS = -Wall -Wextra -Iinclude $(shell pkg-config --cflags sdl2)
-LD_FLAGS = $(shell pkg-config --libs sdl2)
+LD_FLAGS = -lm $(shell pkg-config --libs sdl2)
 
 TARGET = PSO
-SRC = src/main.c src/logger.c src/map.c src/pso.c src/utils.c
+SRC = $(wildcard src/*.c)
 OBJ = $(SRC:.c=.o)
 
 all: $(TARGET)
 
 $(TARGET): $(OBJ)
-	$(COMP) $(OBJ) -o $@ $(LD_FLAGS) -lSDL2
+	$(COMP) $(OBJ) -o $@ $(LD_FLAGS) -lSDL2 -lSDL2_ttf
 
 %.o: %.c
 	$(COMP) $(COMP_FLAGS) -c $< -o $@

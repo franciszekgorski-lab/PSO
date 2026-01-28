@@ -1,13 +1,76 @@
 #include <SDL2/SDL.h>
 #include <stdio.h>
+#include <string.h>
+#include <unistd.h>
+#include <getopt.h>
+
+#include "map.h"
+
+static struct option long_options[] = {
+        {"save",        required_argument,      0, 's'},
+        {"help",        no_argument,            0, 'h'},
+        {"load",        required_argument,      0, 'l'},
+        {"settings",    required_argument,      0, 'o'},
+        {0, 0, 0, 0}
+};
 
 int main(int argc, char** argv) {
+
         if (SDL_Init(SDL_INIT_VIDEO) != 0) {
                 printf("SDL_Init Error: %s\n", SDL_GetError());
                 return 1;
         }
+        Map* map = NULL;
+        
+        int opt;
+        int option_index;
+        int do_save = 0;
+        int do_generate = 0;
 
+        while ( (opt = getopt_long(argc, argv, "ho:l:s:", long_options, &option_index)) != -1 ) {
+                switch (opt) {
+                case 'h':
+                        printf("                ___help___                 \n");
+                        printf("Dostępne opcje:\n\n");
+                        printf("        settings [nazwa pliku]:\n");
+                        printf("Wczytuje plik z ustawieniami do generacji mapy.\n\n");
+                        printf("        load [nazwa pliku]:\n");
+                        printf("Wczytuje plik z mapą w formie wartości każdej komórki rozdzielonej spacją.\n\n");
+                        printf("        save [nazwa pliku]:\n");
+                        printf("Zapisuje mapę do pliku txt\n\n");
+                        return 1;
+                        break;
 
-        SDL_Quit();
+                case 'o':
+                        map = Map_LoadFromSettings(optarg);
+                        do_generate = 1;
+                        break;
+
+                case 'l':
+                        map = Map_Load(optarg);
+                        break;
+
+                case 's':
+                        do_save = 1;
+                        break;
+
+                case '?':
+                        printf("Nieznany argument!\n");
+                        break;
+                }
+        }       
+
+        if ( map == NULL ) {
+                printf("Brak mapy!\n");
+                return 1;
+        }
+
+        if ( do_generate ) Map_Generate(map);
+
+        Map_Visualize(map);
+
+        if ( do_save ) Map_Save(map);
+        
+        Map_Destroy(map);
         return 0;
 }
