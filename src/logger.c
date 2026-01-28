@@ -4,8 +4,8 @@
 void log_positions( FILE * fptr, swarm * s, int iteration ){
     fprintf(fptr,"%d",iteration);
     for(int i=0; i<s->size; s++){
-        particle p = s->particle_arr[i];
-        fprintf(fpt,"%d, %lf, %lf, ", i, p->pos_x, p->pos_y);
+        particle * p = s->particle_arr[i];
+        fprintf(fptr,"%d, %lf, %lf, ", i, p->pos_x, p->pos_y);
     }
-    fprintf(fpt,"\n");
+    fprintf(fptr,"\n");
 }
