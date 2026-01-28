@@ -261,7 +261,8 @@ void Map_Visualize(Map* map) {
         SDL_Color black = {10, 10, 10, 0};
         char buffer[20];
 
-        for (int i = 0; i < map->heigth; i += map->heigth/10) {
+        int lines = map->heigth >= 10 ? 10 : map->heigth;
+        for (int i = 0; i < map->heigth; i += map->heigth/lines) {
                 int h = MAP_SIZE + 70 - (((double)i / (double)map->heigth) * MAP_SIZE);
                 sprintf(buffer, "%d", i);
                 draw_text(renderer, font, buffer, 25, h - 15, black);
@@ -272,7 +273,7 @@ void Map_Visualize(Map* map) {
                 SDL_RenderDrawLine(renderer, 65, h, 70, h);
         }
 
-        for (int i = 0; i < map->width; i += map->width/10) {
+        for (int i = 0; i < map->width; i += map->width/lines) {
                 int w = 70 + (((double)i / (double)map->width) * MAP_SIZE);
                 sprintf(buffer, "%d", i);
                 draw_text(renderer, font, buffer, w, MAP_SIZE + 70, black);
