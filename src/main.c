@@ -10,6 +10,7 @@
 #include "pso.h"
 
 #define LOG_PATH "logs.csv"
+#define FRAME_TIME 3000
 
 int main(int argc, char** argv) {
         //flagi do zapisywania i generowania mapy
@@ -96,13 +97,20 @@ int main(int argc, char** argv) {
         int i = 0;
         log_headers(log_fptr,s);
         while(i<log_s.ite){
+                int begin = SDL_GetTicks();
                 if(i % log_s.log_ite == 0){
                         log_positions(log_fptr, s, i / log_s.log_ite);
-                        Map_Visualize(map, s);
                 }
                 i++;
+                
+                //Wizualizacja
+                Map_Visualize(map, s);
+
                 //odpowiada za predkosci kazdej czastki i aktualiowanie pBest i gBest
                 update_particles(s,map,pso_s);
+                int end = SDL_GetTicks();
+
+                SDL_Delay((FRAME_TIME/log_s.ite) - (end - begin));
         }
         log_results(log_fptr,s);
         fclose(log_fptr);
