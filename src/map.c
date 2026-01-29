@@ -1,3 +1,4 @@
+#include "pso.h"
 #include "map.h"
 #include "utils.h"
 
@@ -29,6 +30,15 @@ Map* Map_Construct(int w, int h, int x_r, int n_r, int x_h, int n_h, int m) {
         temp->depth = Vector_Construct(w * h);
 
         for (int i = 0; i < temp->depth->size; i++)      temp->depth->value[i] = 0;
+        
+        temp->window = 
+                SDL_CreateWindow("PSO", 
+                SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 
+                MAP_SIZE + 180, MAP_SIZE + 140, 
+                SDL_WINDOW_RESIZABLE);
+        
+        temp->renderer = SDL_CreateRenderer(temp->window, -1, SDL_RENDERER_ACCELERATED);
+        
         return temp;
 }
 
@@ -71,6 +81,7 @@ Map* Map_LoadFromSettings(const char* file_path) {
                 printf("Zbyt duże rozmiary mapy!");
                 return NULL;
         }
+        
         return temp;
 }
 
@@ -141,6 +152,14 @@ Map* Map_Load(const char* file_path) {
                 temp->depth->value[counter] = buf;
                 counter++;
         }
+        
+        temp->window = 
+                SDL_CreateWindow("PSO", 
+                SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 
+                MAP_SIZE + 180, MAP_SIZE + 140, 
+                SDL_WINDOW_RESIZABLE);
+        
+        temp->renderer = SDL_CreateRenderer(temp->window, -1, SDL_RENDERER_ACCELERATED);
 
         return temp;
 }
@@ -188,16 +207,9 @@ void draw_text(SDL_Renderer* renderer, TTF_Font* font, const char* text, int x, 
 //      Deklaruje i definiuje wszyzstkie niezbędne zmienne dla SDL2 (window, renderer, event)
 //      aby wygodnie korzystać z programu.
 //      Ważniejsze części kodu wytłumaczone są wewnątrz funkcji.
-void Map_Visualize(Map* map) {
-        SDL_Window* window = 
-                SDL_CreateWindow("PSO", 
-                SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 
-                MAP_SIZE + 180, MAP_SIZE + 140, 
-                SDL_WINDOW_RESIZABLE);
-        
-        SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-        SDL_Event event;
-        int running = 1;
+void Map_Visualize(Map* map, swarm* s) {
+        SDL_Renderer* renderer = map->renderer;
+
 
         TTF_Init();
         TTF_Font* font = TTF_OpenFont("fonts/arial.ttf", 24);
@@ -370,33 +382,30 @@ void Map_Visualize(Map* map) {
                 draw_text(renderer, font, buffer, dst.x - 30, dst.y + 10, black);
         }
 
-        SDL_RenderPresent(renderer);
-        SDL_DestroyTexture(texture);
+        {
+                SDL_Rect dst;
+                for (int i = 0; i < s->size; i++) {
+                        dst.w = 9; dst.h = 9;
+                        dst.x = 66 + (int)s->particle_arr[i]->pos_x * (MAP_SIZE / map->width);
+                        dst.y = 66 + (int)s->particle_arr[i]->pos_y * (MAP_SIZE / map->heigth);
+                        dst.x += ( (MAP_SIZE / map->width) / 2);
+                        dst.y += ( (MAP_SIZE / map->heigth) / 2);
 
-        // Główna pętla, można sobie popatrzeć
-        while ( running == 1 ) {
-                while( SDL_PollEvent(&event) ) {
-                        switch(event.type) {
-                        case SDL_QUIT:
-                                running = 0;
-                                break;
-                        default:
-                                break;
-                        }
+                        SDL_RenderFillRect(renderer, &dst);
                 }
-                SDL_Delay(50);
         }
 
-        SDL_DestroyRenderer(renderer);
-        SDL_DestroyWindow(window);
+        SDL_RenderPresent(renderer);
+        SDL_DestroyTexture(texture);
         TTF_CloseFont(font);
-
-        SDL_Quit();
 }
 
 void Map_Destroy(Map* map) {
+        SDL_DestroyRenderer(map->renderer);
+        SDL_DestroyWindow(map->window);
         Vector_Destroy(map->depth);
         free(map);
+        SDL_Quit();
 }
 
 void Map_Save(Map* map) {

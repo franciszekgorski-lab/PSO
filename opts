@@ -1,0 +1,7 @@
+width           100
+heigth          100
+radius_min      10
+radius_max      30
+h_min           5
+h_max           40
+multi           100
