@@ -98,12 +98,11 @@ int main(int argc, char** argv) {
         while(i<log_s.ite){
                 if(i % log_s.log_ite == 0){
                         log_positions(log_fptr, s, i / log_s.log_ite);
+                        Map_Visualize(map, s);
                 }
                 i++;
                 //odpowiada za predkosci kazdej czastki i aktualiowanie pBest i gBest
-                Map_Visualize(map, s);
                 update_particles(s,map,pso_s);
-                SDL_Delay(200); 
         }
         log_results(log_fptr,s);
         fclose(log_fptr);
