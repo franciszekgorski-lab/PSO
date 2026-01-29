@@ -82,14 +82,6 @@ Map* Map_LoadFromSettings(const char* file_path) {
                 return NULL;
         }
         
-        temp->window = 
-                SDL_CreateWindow("PSO", 
-                SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 
-                MAP_SIZE + 180, MAP_SIZE + 140, 
-                SDL_WINDOW_RESIZABLE);
-        
-        temp->renderer = SDL_CreateRenderer(temp->window, -1, SDL_RENDERER_ACCELERATED);
-
         return temp;
 }
 

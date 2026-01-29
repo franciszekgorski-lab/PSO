@@ -13,8 +13,7 @@
 
 int main(int argc, char** argv) {
         //flagi do zapisywania i generowania mapy
-        int do_save = 1;
-        int do_generate = 0;
+        int do_save = 0;
         //zmienna odpowiadajaca za domyslna ilosc czastek
         int particle_number = 100;
 
@@ -44,54 +43,57 @@ int main(int argc, char** argv) {
                 return 1;
         }
 
-        //ładowanie mapy mozna zostawić tak ale można też dodać generacje gdy nie uda sie jej zaladowac
         Map* map = NULL;
-        map = Map_Load(argv[1]);
-        if ( map == NULL ) {
-                printf("Brak mapy!\n");
-                return 1;
-        }
-        
-        //w zwiazku z tym jak wyglada sygnatura wywolania
-        //wiemy ze co 2 argument to -(literka) 
-        int i = 2; 
-        while((i<argc) && (i+1 < argc)){
-                if(argv[i][0] != '-'){
-                        printf(" Zly format argumentow wywolania ");
-                        return 1;
-                }
-                switch(argv[i][1]){
+
+        int opt;
+        while((opt = getopt(argc, argv, "l:p:c:n:i:sg:")) != -1){
+                switch(opt){
+                        case 'l':
+                                map = Map_Load(optarg);
+                                break;
                         case 'p':
-                                particle_number = atoi(argv[i+1]);
+                                particle_number = atoi(optarg);
                                 printf("particle number %d \n", particle_number);
                                 break;
                         case 'c':
-                                pso_s = read_pso_settings(argv[i+1]);
+                                pso_s = read_pso_settings(optarg);
                                 printf("pso set w %lf c1 %lf c2 %lf \n", pso_s.w, pso_s.c1, pso_s.c2);
                                 break;
                         case 'n':
-                                log_s.log_ite = atoi(argv[i+1]);
+                                log_s.log_ite = atoi(optarg);
                                 printf("log frequency %d \n", log_s.log_ite);
                                 break;
                         case 'i':
-                                log_s.ite = atoi(argv[i+1]);
+                                log_s.ite = atoi(optarg);
                                 printf("all iterations %d\n", log_s.ite);
                                 break;
+                        case 's':
+                                do_save = 1;
+                                break;
+                        case 'g':
+                                map = Map_LoadFromSettings(optarg);
+                                Map_Generate(map);
+                                break;
+                        default:
+                                break;
                 }
-                i+=2;
+        
+        }
+        
+        //ładowanie mapy mozna zostawić tak ale można też dodać generacje gdy nie uda sie jej zaladowac
+        if ( map == NULL ) {
+                printf("Brak mapy!\n");
+                return 1;
         }
 
         //incijalizujemy swarm - S z PSO
         swarm * s = swarm_construct(particle_number, map);
 
-        // generowanie mapy
-        if ( do_generate ) Map_Generate(map);
-
         //rysowanie mapy
         Map_Visualize(map, s);
        
         // Pętla roju 
-        i = 0;
+        int i = 0;
         log_headers(log_fptr,s);
         while(i<log_s.ite){
                 if(i % log_s.log_ite == 0){
