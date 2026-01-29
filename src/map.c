@@ -386,8 +386,8 @@ void Map_Visualize(Map* map, swarm* s) {
                 SDL_Rect dst;
                 for (int i = 0; i < s->size; i++) {
                         dst.w = 9; dst.h = 9;
-                        dst.x = 66 + (int)s->particle_arr[i]->pos_x * (MAP_SIZE / map->width);
-                        dst.y = 66 + (int)s->particle_arr[i]->pos_y * (MAP_SIZE / map->heigth);
+                        dst.x = 66 + (int)(s->particle_arr[i]->pos_x) * (MAP_SIZE / map->width);
+                        dst.y = 66 + (int)(s->particle_arr[i]->pos_y) * (MAP_SIZE / map->heigth);
                         dst.x += ( (MAP_SIZE / map->width) / 2);
                         dst.y += ( (MAP_SIZE / map->heigth) / 2);
 
