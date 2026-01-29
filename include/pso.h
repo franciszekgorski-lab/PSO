@@ -1,7 +1,7 @@
 #ifndef PSO
 #define PSO
 
-#include "map.h"
+typedef struct _map Map;
 
 typedef struct {
         double w, c1, c2;
@@ -16,7 +16,7 @@ typedef struct{
     int highest_found_y;
 } particle;
 
-typedef struct{
+typedef struct swarm{
     particle ** particle_arr;
     int size;
     int highest_found_x;

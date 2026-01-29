@@ -88,8 +88,8 @@ int main(int argc, char** argv) {
         if ( do_generate ) Map_Generate(map);
 
         //rysowanie mapy
-        //Map_Visualize(map);
-        
+        Map_Visualize(map, s);
+       
         // Pętla roju 
         i = 0;
         log_headers(log_fptr,s);
@@ -99,13 +99,32 @@ int main(int argc, char** argv) {
                 }
                 i++;
                 //odpowiada za predkosci kazdej czastki i aktualiowanie pBest i gBest
+                Map_Visualize(map, s);
                 update_particles(s,map,pso_s);
+                SDL_Delay(200); 
         }
         log_results(log_fptr,s);
         fclose(log_fptr);
+       
         //zapisywanie mapy
         if ( do_save ) Map_Save(map);
+
+        int running = 1;
+        SDL_Event event;
+        while (running) {
+                while(SDL_PollEvent(&event)) {
+                        switch(event.type) {
+                        case SDL_QUIT:
+                                running = 0;
+                                break;
+                        default: 
+                                break;
+                        }
+                }
+        }
+               
         Map_Destroy(map);
         destroy_swarm(s);
+       
         return 0;
 }

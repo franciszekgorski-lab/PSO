@@ -1,7 +1,10 @@
 #ifndef GENEROWANIE_MAPY
 #define GENEROWANIE_MAPY
 
+#include <SDL2/SDL.h>
 #include "utils.h"
+
+typedef struct swarm swarm;
 
 typedef struct _map{
         int width;
@@ -11,6 +14,8 @@ typedef struct _map{
         int max_r;
         int min_r;
         int multi;
+        SDL_Window* window;
+        SDL_Renderer* renderer;
         Vector* depth;
 } Map;
 
@@ -20,7 +25,7 @@ void Map_Generate(Map* map);
 Map* Map_Load(const char* file_path);
 double Map_GetDist(Map* map, int index0, int index1);
 void Map_Print(Map* map);
-void Map_Visualize(Map* map);
+void Map_Visualize(Map* map, swarm* s);
 void Map_Destroy(Map* map);
 void Map_Save(Map* map);
 
