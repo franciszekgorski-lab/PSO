@@ -12,9 +12,10 @@
 #define LOG_PATH "logs.csv"
 
 int main(int argc, char** argv) {
-
+        //flagi do zapisywania i generowania mapy
         int do_save = 1;
         int do_generate = 0;
+        //zmienna odpowiadajaca za domyslna ilosc czastek
         int particle_number = 100;
 
         FILE * log_fptr = fopen(LOG_PATH, "w");
@@ -23,20 +24,21 @@ int main(int argc, char** argv) {
                 return 1 ;
         }
 
-
+        // domyslne wartosci ustawien algorytmu pso - w, c1, c2
         pso_settings pso_s = (pso_settings){
                 1,1,1
         };
+        // domyslne wartosci utawien loggera - ilosc wszystkich iteracji i czestotoliwosc loggowania
         log_settings log_s = (log_settings){
                 100, 0
         };
-
+        
         if (SDL_Init(SDL_INIT_VIDEO) != 0) {
                 printf("SDL_Init Error: %s\n", SDL_GetError());
                 return 1;
         }
 
-        //nwm czy to chcemy 
+        //to chyba trzeba bedzie usunac
         if(argc < 10){
                 printf("Zbyt mało argumentów");
                 return 1;
@@ -50,7 +52,8 @@ int main(int argc, char** argv) {
                 return 1;
         }
         
-
+        //w zwiazku z tym jak wyglada sygnatura wywolania
+        //wiemy ze co 2 argument to -(literka) 
         int i = 2; 
         while((i<argc) && (i+1 < argc)){
                 if(argv[i][0] != '-'){
@@ -78,14 +81,15 @@ int main(int argc, char** argv) {
                 i+=2;
         }
 
+        //incijalizujemy swarm - S z PSO
         swarm * s = swarm_construct(particle_number, map);
 
         // generowanie mapy
         if ( do_generate ) Map_Generate(map);
 
         //rysowanie mapy
-
         //Map_Visualize(map);
+        
         // Pętla roju 
         i = 0;
         log_headers(log_fptr,s);
@@ -94,6 +98,7 @@ int main(int argc, char** argv) {
                         log_positions(log_fptr, s, i / log_s.log_ite);
                 }
                 i++;
+                //odpowiada za predkosci kazdej czastki i aktualiowanie pBest i gBest
                 update_particles(s,map,pso_s);
         }
         log_results(log_fptr,s);
