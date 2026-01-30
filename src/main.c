@@ -38,12 +38,6 @@ int main(int argc, char** argv) {
                 return 1;
         }
 
-        //to chyba trzeba bedzie usunac
-        if(argc < 10){
-                printf("Zbyt mało argumentów");
-                return 1;
-        }
-
         Map* map = NULL;
 
         int opt;
